@@ -577,3 +577,102 @@
   transition: opacity 0.15s;
   &:hover { opacity: 0.88; }
 }
+
+// ── Field List modal ────────────────────────────────────
+.fl-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border-radius: 14px 14px 0 0;
+  border-bottom: none;
+  h2   { color: #fff; }
+  .sub { color: rgba(255,255,255,0.75); }
+  .close-btn { color: rgba(255,255,255,0.8); &:hover { background: rgba(255,255,255,0.15); color:#fff; } }
+}
+
+.fl-empty {
+  text-align: center;
+  padding: 48px 20px;
+  .fl-empty-icon { font-size: 48px; margin-bottom: 12px; }
+  p { margin: 0; font-size: 15px; font-weight: 600; color: #555; }
+  .fl-empty-sub { font-size: 13px; color: #999; font-weight: 400; margin-top: 6px; }
+}
+
+.fl-table-wrap {
+  overflow-x: auto;
+}
+
+.fl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+
+  thead {
+    background: #f5f7fa;
+    th {
+      padding: 11px 14px;
+      text-align: left;
+      font-weight: 700;
+      color: #555;
+      border-bottom: 2px solid #e8e8e8;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+    &:hover { background: #fafbff; }
+
+    td {
+      padding: 11px 14px;
+      color: #2c3e50;
+      vertical-align: middle;
+    }
+  }
+
+  .fl-num    { color: #aaa; font-weight: 700; width: 36px; }
+  .fl-crop   { font-weight: 700; color: #1a6fc4; }
+  .fl-center { text-align: center; }
+  .fl-date   { color: #888; font-size: 12px; }
+
+  .fl-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+}
+
+.fl-btn-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  background: #1a6fc4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.85; }
+}
+
+.fl-btn-del {
+  padding: 5px 8px;
+  background: transparent;
+  border: 1px solid #fde8e8;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: #fde8e8; }
+}
+
+.fl-count {
+  font-size: 13px;
+  color: #888;
+  margin-right: auto;
+}
