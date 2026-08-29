@@ -1,0 +1,33 @@
+<div class="card crop-suggestion-card">
+  <div class="card-header">
+    <span class="icon">🌾</span>
+    <h2>Crop Suggestion</h2>
+  </div>
+
+  <div class="card-content">
+    <div class="selected-crop">
+      <h3>{{ selectedCrop.name }}</h3>
+      <p class="description">{{ selectedCrop.description }}</p>
+      <div class="moisture-info">
+        <span class="label">Soil Moisture:</span>
+        <span class="value">{{ selectedCrop.moisture }}</span>
+      </div>
+    </div>
+
+    <div class="crop-list">
+      <div
+        *ngFor="let crop of crops"
+        class="crop-item"
+        [class.active]="selectedCrop === crop"
+        (click)="selectCrop(crop)"
+      >
+        <span class="crop-icon">{{ crop.icon }}</span>
+        <span class="crop-name">{{ crop.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <button class="btn btn-primary" (click)="selectCrop(selectedCrop)">View Details</button>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="card field-list-card">
+  <div class="card-header">
+    <span class="icon">📋</span>
+    <h2>Field List</h2>
+  </div>
+
+  <div class="card-content">
+    <div *ngIf="isLoading" class="loading">
+      <p>Loading fields...</p>
+    </div>
+
+    <div *ngIf="!isLoading && fields.length === 0" class="no-data">
+      <p>No fields added yet. Create your first field to get started.</p>
+    </div>
+
+    <div *ngIf="!isLoading && fields.length > 0" class="fields-list">
+      <div *ngFor="let field of fields" class="field-item">
+        <div class="field-info">
+          <h3>{{ field.name }}</h3>
+          <p class="location">📍 {{ field.location }}</p>
+        </div>
+
+        <div class="field-stats">
+          <div class="stat">
+            <span class="label">Moisture</span>
+            <span class="value" [class]="getMoistureColor(field.soilMoisture)">
+              {{ field.soilMoisture }}%
+            </span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Temp</span>
+            <span class="value">{{ field.temperature }}°C</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Status</span>
+            <span class="status-badge" [class]="getStatusBadge(field.status)">
+              {{ field.status | titlecase }}
+            </span>
+          </div>
+        </div>
+
+        <div class="field-actions">
+          <button class="btn-icon" title="Edit">✏️</button>
+          <button class="btn-icon" title="View" (click)="loadFields()">👁️</button>
+          <button
+            class="btn-icon delete"
+            title="Delete"
+            (click)="deleteField(field.id)"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
