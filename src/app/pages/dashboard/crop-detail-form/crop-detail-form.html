@@ -1,0 +1,90 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onClickBackdrop($event)">
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-title">
+        <h2>{{ cropData?.cropName }} - Field Details</h2>
+        <p class="field-info">{{ cropData?.fieldName }} | {{ cropData?.fieldSize }}</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()" title="Close">✕</button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-group">
+          <label>Field Name</label>
+          <input type="text" [value]="cropData?.fieldName" readonly />
+        </div>
+        <div class="form-group">
+          <label>Field Size</label>
+          <input type="text" [value]="cropData?.fieldSize" readonly />
+        </div>
+      </div>
+
+      <!-- Status Table -->
+      <div class="status-table">
+        <h3>Field Status Values</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th class="good">✓ Good</th>
+              <th class="moderate">! Moderate</th>
+              <th class="critical">✗ Critical</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let status of fieldStatuses">
+              <td class="parameter">
+                <span class="icon">{{ status.icon }}</span>
+                <div>
+                  <strong>{{ status.parameter }}</strong>
+                  <span class="current-value" [style.color]="getStatusColor(status.status)">
+                    {{ status.value }} {{ status.unit }}
+                  </span>
+                </div>
+              </td>
+              <td class="good">{{ status.threshold.good }}</td>
+              <td class="moderate">{{ status.threshold.moderate }}</td>
+              <td class="critical">{{ status.threshold.critical }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Status Badges -->
+      <div class="status-badges">
+        <h3>Current Status</h3>
+        <div class="badges-grid">
+          <div
+            *ngFor="let status of fieldStatuses"
+            class="status-badge"
+            [style.backgroundColor]="getStatusBgColor(status.status)"
+          >
+            <div class="badge-header">
+              <span class="badge-icon">{{ status.icon }}</span>
+              <span class="badge-label">{{ status.parameter }}</span>
+            </div>
+            <div class="badge-value" [style.color]="getStatusColor(status.status)">
+              {{ status.value }} {{ status.unit }}
+            </div>
+            <div
+              class="badge-status"
+              [style.backgroundColor]="getStatusColor(status.status)"
+              [style.color]="'white'"
+            >
+              {{ status.status | titlecase }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+      <button class="btn btn-primary">Refresh Data</button>
+    </div>
+  </div>
+</div>

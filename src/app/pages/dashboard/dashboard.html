@@ -1,0 +1,204 @@
+<div class="dashboard-container">
+
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>Welcome to Smart Irrigation System</p>
+  </div>
+
+  <!-- Tiles -->
+  <div class="tiles-grid">
+    <button class="tile" (click)="openModal('crop')">
+      <span class="tile-icon">🌾</span>
+      <span class="tile-label">Crop Suggestion</span>
+    </button>
+    <button class="tile" (click)="openModal('addField')">
+      <span class="tile-icon">➕</span>
+      <span class="tile-label">Add a Field</span>
+    </button>
+    <button class="tile" (click)="openModal('fieldList')">
+      <span class="tile-icon">📋</span>
+      <span class="tile-label">Field List</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CROP SUGGESTION MODAL
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="activeModal === 'crop'" (click)="onBackdropClick($event)">
+  <div class="modal-box modal-box--wide">
+
+    <!-- Header -->
+    <div class="modal-box-header crop-header">
+      <div>
+        <h2>🌾 Crop Suggestion</h2>
+        <p class="sub">Fill in your field details to get crop recommendations</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-box-body">
+
+      <!-- ── Step 1: Field Details ── -->
+      <div class="step-section">
+        <div class="step-label">Step 1 — Field Details</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Field Name <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="fieldName" placeholder="e.g., North Field" />
+          </div>
+          <div class="form-group">
+            <label>Field Size <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="fieldSize" placeholder="e.g., 5 hectares" />
+          </div>
+          <div class="form-group">
+            <label>Soil Type</label>
+            <select [(ngModel)]="soilType">
+              <option *ngFor="let t of soilTypes" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Location <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="location" placeholder="e.g., Plot A, Sector 5" />
+          </div>
+        </div>
+
+        <div class="error-msg" *ngIf="formError">{{ formError }}</div>
+
+        <button class="btn btn-secondary" (click)="generateSensors()">
+          📡 Generate Sensor Values
+        </button>
+      </div>
+
+      <!-- ── Step 2: Sensor Readings ── -->
+      <div class="step-section" *ngIf="sensors">
+        <div class="step-label">Step 2 — Sensor Readings</div>
+
+        <div class="sensor-cards">
+          <div class="sensor-card" *ngFor="let s of fieldStatuses"
+               [style.border-color]="statusColor(s.status)">
+            <div class="sensor-icon">{{ s.icon }}</div>
+            <div class="sensor-info">
+              <span class="sensor-name">{{ s.parameter }}</span>
+              <span class="sensor-value" [style.color]="statusColor(s.status)">
+                {{ s.value }} {{ s.unit }}
+              </span>
+            </div>
+            <div class="sensor-badge" [style.background]="statusColor(s.status)">
+              {{ s.status | titlecase }}
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn-outline" (click)="generateSensors()">🔄 Regenerate</button>
+          <button class="btn btn-primary" (click)="suggestCrop()">🌱 Suggest Crop</button>
+        </div>
+      </div>
+
+      <!-- ── Step 3: Crop Results ── -->
+      <div class="step-section" *ngIf="showResults">
+        <div class="step-label">Step 3 — Recommended Crops</div>
+
+        <div class="results-summary">
+          Based on your field conditions at <strong>{{ location }}</strong>
+          ({{ soilType }} soil, {{ fieldSize }}):
+        </div>
+
+        <!-- Top 5 results -->
+        <div class="crop-results">
+          <div
+            *ngFor="let c of cropResults.slice(0, 5); let i = index"
+            class="crop-result-card"
+            [class.top-pick]="i === 0"
+          >
+            <div class="rank">#{{ i + 1 }}</div>
+            <div class="crop-icon-big">{{ c.icon }}</div>
+            <div class="crop-info">
+              <div class="crop-name">{{ c.name }}</div>
+              <div class="crop-suit" [style.color]="c.suitabilityColor">{{ c.suitability }}</div>
+              <div class="crop-params">{{ c.matchedParams }}/{{ c.totalParams }} parameters match</div>
+            </div>
+            <div class="score-ring">
+              <svg viewBox="0 0 36 36" width="56" height="56">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#eee" stroke-width="3"/>
+                <circle cx="18" cy="18" r="15.9" fill="none"
+                  [attr.stroke]="suitabilityDotColor(c.score)"
+                  stroke-width="3"
+                  [attr.stroke-dasharray]="c.score + ', 100'"
+                  stroke-linecap="round"
+                  transform="rotate(-90 18 18)"/>
+                <text x="18" y="21" text-anchor="middle" font-size="8" font-weight="bold"
+                  [attr.fill]="suitabilityDotColor(c.score)">{{ c.score }}%</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- All remaining crops collapsed -->
+        <details class="all-crops-toggle">
+          <summary>Show all {{ cropResults.length }} crops ranked</summary>
+          <table class="all-crops-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Crop</th>
+                <th>Score</th>
+                <th>Suitability</th>
+                <th>Params Matched</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of cropResults; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ c.icon }} {{ c.name }}</td>
+                <td><strong [style.color]="suitabilityDotColor(c.score)">{{ c.score }}%</strong></td>
+                <td [style.color]="c.suitabilityColor">{{ c.suitability }}</td>
+                <td>{{ c.matchedParams }}/{{ c.totalParams }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+
+    </div><!-- /modal-box-body -->
+
+    <div class="modal-box-footer">
+      <button class="btn btn-ghost" (click)="resetCropForm()">🔁 Reset</button>
+      <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ADD FIELD MODAL
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="activeModal === 'addField'" (click)="onBackdropClick($event)">
+  <div class="modal-box">
+    <div class="modal-box-header">
+      <h2>➕ Add a Field</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-box-body">
+      <app-add-field></app-add-field>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     FIELD LIST MODAL
+════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="activeModal === 'fieldList'" (click)="onBackdropClick($event)">
+  <div class="modal-box modal-box--wide">
+    <div class="modal-box-header">
+      <h2>📋 Field List</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+    <div class="modal-box-body">
+      <app-field-list></app-field-list>
+    </div>
+  </div>
+</div>

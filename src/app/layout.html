@@ -6,10 +6,10 @@
     <aside class="layout-sidebar" [class.collapsed]="!isSidebarOpen">
       <nav class="sidebar-nav">
         <ul>
-          <li><a routerLink="/" class="nav-link">Dashboard</a></li>
-          <li><a routerLink="/zones" class="nav-link">Zones</a></li>
-          <li><a routerLink="/schedules" class="nav-link">Schedules</a></li>
-          <li><a routerLink="/settings" class="nav-link">Settings</a></li>
+          <li><a routerLink="/dashboard/home" class="nav-link">Dashboard</a></li>
+          <li><a routerLink="/dashboard/zones" class="nav-link">Zones</a></li>
+          <li><a routerLink="/dashboard/schedules" class="nav-link">Schedules</a></li>
+          <li><a routerLink="/dashboard/settings" class="nav-link">Settings</a></li>
         </ul>
       </nav>
     </aside>
@@ -22,3 +22,6 @@
 
   <app-footer></app-footer>
 </div>
+
+<!-- Global Modal for Crop Details -->
+<app-crop-detail-form></app-crop-detail-form>
