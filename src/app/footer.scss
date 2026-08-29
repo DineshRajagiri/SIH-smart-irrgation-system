@@ -1,0 +1,19 @@
+$footer-height: 50px;
+$primary-color: #2c3e50;
+$border-color: #ecf0f1;
+
+.layout-footer {
+  background-color: $primary-color;
+  color: white;
+  height: $footer-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-top: 1px solid $border-color;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}

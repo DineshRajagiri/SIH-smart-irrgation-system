@@ -1,0 +1,60 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Smart Irrigation System</h1>
+      <p>Login to your account</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="login-button" [disabled]="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <button
+        type="button"
+        class="forgot-password-link"
+        (click)="onForgotPassword()"
+      >
+        Forgot Password?
+      </button>
+    </div>
+
+    <div class="demo-credentials">
+      <p><strong>Demo Credentials:</strong></p>
+      <p>Email: <code>admin@irrigation.com</code></p>
+      <p>Password: <code>password123</code></p>
+    </div>
+  </div>
+</div>

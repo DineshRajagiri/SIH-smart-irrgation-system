@@ -1,0 +1,122 @@
+$header-height: 60px;
+$sidebar-width: 250px;
+$footer-height: 50px;
+$transition-duration: 0.3s;
+$primary-color: #2c3e50;
+$secondary-color: #34495e;
+$text-color: #2c3e50;
+$border-color: #ecf0f1;
+
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// Body Layout
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Sidebar Styles
+.layout-sidebar {
+  width: $sidebar-width;
+  background-color: $secondary-color;
+  color: white;
+  overflow-y: auto;
+  transition: width $transition-duration, margin-left $transition-duration;
+  z-index: 99;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+
+  &.collapsed {
+    width: 0;
+    margin-left: -$sidebar-width;
+  }
+
+  .sidebar-nav {
+    padding: 20px 0;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin: 0;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background-color $transition-duration;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-left-color: #3498db;
+      }
+
+      &.active {
+        background-color: rgba(52, 152, 219, 0.2);
+        border-left-color: #3498db;
+      }
+    }
+  }
+}
+
+// Main Content Area
+.layout-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f5f7fa;
+  padding: 20px;
+  transition: margin-left $transition-duration;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .layout-sidebar {
+    position: fixed;
+    left: 0;
+    top: $header-height;
+    height: calc(100vh - $header-height - $footer-height);
+    width: $sidebar-width;
+
+    &.collapsed {
+      transform: translateX(-100%);
+      box-shadow: none;
+    }
+  }
+
+  .layout-content {
+    padding: 15px;
+  }
+}
+
+// Scrollbar Styling
+.layout-sidebar::-webkit-scrollbar,
+.layout-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.layout-sidebar::-webkit-scrollbar-track,
+.layout-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.layout-sidebar::-webkit-scrollbar-thumb,
+.layout-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
