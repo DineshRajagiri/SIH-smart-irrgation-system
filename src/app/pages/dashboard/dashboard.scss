@@ -359,3 +359,221 @@
   &.btn-outline  { background: transparent; border: 2px solid #667eea; color: #667eea; }
   &.btn-ghost    { background: transparent; color: #888; &:hover { color: #444; } }
 }
+
+// ── Analysis modal header ───────────────────────────────
+.analyse-header {
+  background: linear-gradient(135deg, #1a6fc4 0%, #0d47a1 100%);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  h2   { color: #fff; }
+  .sub { color: rgba(255,255,255,0.82); }
+  .close-btn { color: rgba(255,255,255,0.8); &:hover { background: rgba(255,255,255,0.15); color: #fff; } }
+}
+
+.an-label {
+  color: #1a6fc4;
+  border-bottom-color: #d0e8ff;
+}
+
+// ── Crop banner ─────────────────────────────────────────
+.crop-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f8ff, #e8f4fd);
+  border: 1px solid #b3d9f7;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.crop-banner-icon { font-size: 40px; }
+
+.crop-banner-info {
+  flex: 1;
+  min-width: 160px;
+  .crop-banner-name  { font-size: 18px; font-weight: 700; color: #1a6fc4; }
+  .crop-banner-stage { font-size: 13px; color: #555; margin-top: 3px; }
+  .crop-banner-desc  { font-size: 12px; color: #777; margin-top: 3px; font-style: italic; }
+}
+
+.crop-banner-need {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+// ── Irrigation 3-card grid ──────────────────────────────
+.irrigation-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.irrigation-card {
+  border: 1px solid #e8e8e8;
+  border-top: 4px solid #ccc;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.irr-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  .irr-icon { font-size: 20px; }
+}
+
+.irr-decision-badge {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.irr-message {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.irr-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.irr-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+
+  &.highlight {
+    grid-column: span 2;
+    background: #e8f4fd;
+    border: 1px solid #b3d9f7;
+  }
+
+  .irr-stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; }
+  .irr-stat-value { font-size: 14px; font-weight: 700; color: #2c3e50; }
+}
+
+// ── Growth stage timeline ───────────────────────────────
+.stage-timeline {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px 20px;
+  border: 1px solid #eee;
+}
+
+.stage-timeline-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stage-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.stage-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 80px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    right: -50%;
+    height: 2px;
+    background: #ddd;
+    z-index: 0;
+  }
+
+  &.active {
+    .stage-dot { background: #3498db !important; box-shadow: 0 0 0 4px rgba(52,152,219,0.2); }
+    .stage-step-label { color: #1a6fc4; font-weight: 700; }
+  }
+}
+
+.stage-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #ddd;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 6px;
+  transition: background 0.2s;
+}
+
+.stage-step-label {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.stage-step-days {
+  font-size: 10px;
+  color: #aaa;
+  text-align: center;
+}
+
+// ── Extra buttons ───────────────────────────────────────
+.btn-outline-blue {
+  background: transparent;
+  border: 2px solid #1a6fc4;
+  color: #1a6fc4;
+  padding: 9px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.8; }
+}
+
+.btn-analyse {
+  background: linear-gradient(135deg, #1a6fc4, #0d47a1);
+  color: #fff;
+  padding: 9px 20px;
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover { opacity: 0.88; }
+}
