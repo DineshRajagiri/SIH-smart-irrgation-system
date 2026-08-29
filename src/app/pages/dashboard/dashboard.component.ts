@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AddFieldComponent } from './add-field/add-field.component';
 import { FieldListComponent } from './field-list/field-list.component';
 import { FieldStatusService, FieldStatus } from '../../services/field-status.service';
 import { CropSuggestionService, CropResult } from '../../services/crop-suggestion.service';
 import { IrrigationService, IrrigationAnalysis, SensorInput } from '../../services/irrigation.service';
+import { AnalysisStorageService, SavedAnalysis } from '../../services/analysis-storage.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,13 +16,12 @@ import { IrrigationService, IrrigationAnalysis, SensorInput } from '../../servic
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
 
-  // ── Active modal ──────────────────────────────────────
   activeModal: 'crop' | 'analyse' | 'addField' | 'fieldList' | null = null;
 
   // ═══════════════════════════════════════════════════
-  // CROP SUGGESTION state
+  // CROP SUGGESTION
   // ═══════════════════════════════════════════════════
   cs_fieldName = '';
   cs_fieldSize = '';
@@ -35,7 +36,7 @@ export class DashboardComponent {
   cs_error = '';
 
   // ═══════════════════════════════════════════════════
-  // FIELD ANALYSIS state
+  // FIELD ANALYSIS
   // ═══════════════════════════════════════════════════
   an_cropName  = '';
   an_cropAge   = 0;
@@ -49,29 +50,45 @@ export class DashboardComponent {
   an_analysis: IrrigationAnalysis | null = null;
   an_showResults = false;
   an_error = '';
+  an_saved = false; // whether current analysis was already saved
 
   cropNames: string[] = [];
+
+  // ═══════════════════════════════════════════════════
+  // FIELD LIST
+  // ═══════════════════════════════════════════════════
+  savedAnalyses: SavedAnalysis[] = [];
+  private sub = new Subscription();
 
   constructor(
     private fieldStatusService: FieldStatusService,
     private cropSuggestionService: CropSuggestionService,
     private irrigationService: IrrigationService,
+    private storageService: AnalysisStorageService,
   ) {
     this.cropNames = this.irrigationService.getAllCropNames();
     this.an_cropName = this.cropNames[0];
   }
 
-  // ── Modal helpers ─────────────────────────────────────
+  ngOnInit() {
+    this.sub.add(
+      this.storageService.getAll().subscribe(list => this.savedAnalyses = list)
+    );
+  }
+
+  ngOnDestroy() { this.sub.unsubscribe(); }
+
+  // ── Modal helpers ──────────────────────────────────
   openModal(modal: typeof this.activeModal) {
     this.activeModal = modal;
-    if (modal === 'crop')    { this.resetCropSuggestion(); }
-    if (modal === 'analyse') { this.resetAnalysis(); }
+    if (modal === 'crop')    this.resetCropSuggestion();
+    if (modal === 'analyse') this.resetAnalysis();
   }
 
   closeModal() { this.activeModal = null; }
 
   onBackdropClick(e: MouseEvent) {
-    if (e.target === e.currentTarget) { this.closeModal(); }
+    if (e.target === e.currentTarget) this.closeModal();
   }
 
   // ═══════════════════════════════════════════════════
@@ -111,7 +128,8 @@ export class DashboardComponent {
     this.an_fieldName = ''; this.an_fieldSize = '';
     this.an_soilType = 'Loamy'; this.an_location = '';
     this.an_sensors = null; this.an_fieldStatuses = [];
-    this.an_analysis = null; this.an_showResults = false; this.an_error = '';
+    this.an_analysis = null; this.an_showResults = false;
+    this.an_error = ''; this.an_saved = false;
   }
 
   an_generateSensors() {
@@ -124,7 +142,7 @@ export class DashboardComponent {
     this.an_sensors = { soilMoisture: r.soilMoisture, soilTemperature: r.soilTemperature,
       airTemperature: r.airTemperature, humidity: r.humidity, rainfall: r.rainfall };
     this.an_fieldStatuses = this.fieldStatusService.getFieldStatuses(this.an_sensors);
-    this.an_analysis = null; this.an_showResults = false;
+    this.an_analysis = null; this.an_showResults = false; this.an_saved = false;
   }
 
   an_analyse() {
@@ -134,11 +152,53 @@ export class DashboardComponent {
     if (!result) { this.an_error = `Crop "${this.an_cropName}" not found in database.`; return; }
     this.an_analysis = result;
     this.an_showResults = true;
+
+    // Auto-save to field list (only once per analyse click)
+    if (!this.an_saved) {
+      this.storageService.save({
+        cropName:  this.an_cropName,
+        cropAge:   this.an_cropAge,
+        fieldName: this.an_fieldName,
+        fieldSize: this.an_fieldSize,
+        soilType:  this.an_soilType,
+        location:  this.an_location,
+      });
+      this.an_saved = true;
+    }
   }
 
-  // ── Shared helpers ────────────────────────────────────
+  // ── View a saved analysis (re-generate sensors + analyse) ──
+  viewSavedAnalysis(entry: SavedAnalysis) {
+    this.an_cropName  = entry.cropName;
+    this.an_cropAge   = entry.cropAge;
+    this.an_fieldName = entry.fieldName;
+    this.an_fieldSize = entry.fieldSize;
+    this.an_soilType  = entry.soilType;
+    this.an_location  = entry.location;
+    this.an_saved     = true; // already in list
+
+    // Generate fresh sensor values
+    const r = this.fieldStatusService.generateRandomFieldData();
+    this.an_sensors = { soilMoisture: r.soilMoisture, soilTemperature: r.soilTemperature,
+      airTemperature: r.airTemperature, humidity: r.humidity, rainfall: r.rainfall };
+    this.an_fieldStatuses = this.fieldStatusService.getFieldStatuses(this.an_sensors);
+
+    // Run analysis immediately
+    const result = this.irrigationService.analyse(this.an_cropName, this.an_cropAge, this.an_sensors);
+    if (result) {
+      this.an_analysis    = result;
+      this.an_showResults = true;
+      this.an_error       = '';
+    }
+    this.activeModal = 'analyse';
+  }
+
+  deleteAnalysis(id: string) {
+    this.storageService.delete(id);
+  }
+
+  // ── Shared helpers ─────────────────────────────────
   statusColor(s: string) { return s === 'good' ? '#27ae60' : s === 'moderate' ? '#f39c12' : '#e74c3c'; }
-  statusBg(s: string)    { return s === 'good' ? '#d4edda' : s === 'moderate' ? '#fff3cd' : '#f8d7da'; }
 
   suitabilityColor(score: number) {
     if (score >= 80) return '#27ae60';
